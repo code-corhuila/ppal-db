@@ -18,7 +18,7 @@ The database uses the wire values defined in the project domain model:
 - Units: \`unit\`, \`g\`, \`kg\`, \`ml\`, \`L\`, \`package\`.
 - Categories: \`produce\`, \`dairy\`, \`pantry_staples\`, \`canned_goods\`, \`bakery\`, \`meat_eggs\`, \`snacks_other\`.
 - \`expiration_date\` is nullable and uses PostgreSQL \`DATE\`, not a UTC timestamp.
-- Quantity must be greater than zero; Units and Packages require integer quantities.
+- Quantity must be greater than zero with at most three decimal places; Units and Packages require integer quantities. The schema uses NUMERIC(12, 3).
 - IDs and timestamps are managed by PostgreSQL.
 
 ## Local execution
