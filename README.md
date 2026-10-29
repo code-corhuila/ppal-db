@@ -1,39 +1,37 @@
 # ppal-db
 
-Migraciones versionadas de la base de datos.
+Versioned PostgreSQL schema and migration assets for PantryPal.
 
-Forma parte del proyecto **PantryPal** (`ppal`) — Ingeniería para el Desarrollo Móvil (posgrado) · CORHUILA 2026-B.
+## Scope
 
-| | |
-|---|---|
-| Rol | Migraciones de base de datos |
-| Contenerizado | No: son scripts de migración que ejecuta `ppal-infra`. |
-| Gobierno y documentación | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
-| Backlog | GitHub Project `ppal-backlog` |
+The MVP stores products for one controlled demonstration pantry. It has no user accounts, pantry ownership, or per-user isolation. The database is suitable for local development and controlled demonstrations only.
 
-## Ramas
+## Contents
 
-| Rama | Uso |
-|---|---|
-| `develop` | Integración (rama por defecto) |
-| `qa` | Pruebas |
-| `main` | Producción |
+- \`migrations/001_create_products.sql\`: creates the products table, constraints, expiration index, and update timestamp trigger.
+- \`seeds/002_seed_demo_products.sql\`: inserts four illustrative products only when the table is empty.
 
-**Todo cambio a `develop`, `qa` o `main` entra por pull request.** Ninguna de las tres admite
-commits directos, force-push ni borrado (tampoco para administradores).
+## Product contract
 
-1. Trabajo diario: rama `feat/<tema>` o `fix/<tema>` desde `develop` → PR a `develop`.
-2. Promoción: PR `develop` → `qa` y PR `qa` → `main`.
-3. El PR a `main` necesita la aprobación del docente. La rama de trabajo se borra al fusionar.
+The database uses the wire values defined in the project domain model:
 
-## Repositorios del proyecto
+- Units: \`unit\`, \`g\`, \`kg\`, \`ml\`, \`L\`, \`package\`.
+- Categories: \`produce\`, \`dairy\`, \`pantry_staples\`, \`canned_goods\`, \`bakery\`, \`meat_eggs\`, \`snacks_other\`.
+- \`expiration_date\` is nullable and uses PostgreSQL \`DATE\`, not a UTC timestamp.
+- Quantity must be greater than zero; Units and Packages require integer quantities.
+- IDs and timestamps are managed by PostgreSQL.
 
-| Repositorio | Rol |
-|---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Gobierno único del proyecto |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Core de negocio (API) |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Aplicación móvil |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Portal web |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | Migraciones de base de datos |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infraestructura y orquestación |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Paquete de herramientas |
+## Local execution
+
+From a PostgreSQL shell connected to a dedicated development database:
+
+\`\`\`sql
+\\i migrations/001_create_products.sql
+\\i seeds/002_seed_demo_products.sql
+\`\`\`
+
+The migration is also mounted into the local Docker Compose stack maintained by ppal-infra. PostgreSQL's container initialization scripts run only when the data directory is first created. To reinitialize a disposable local demo database, use docker compose down -v from the infrastructure directory; this permanently deletes that local database volume.
+
+## Security boundary
+
+The current API has no authentication. Do not expose this database or its unauthenticated API as a public multi-user production service, and do not store sensitive personal data.
