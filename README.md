@@ -8,16 +8,16 @@ The MVP stores products for one controlled demonstration pantry. It has no user 
 
 ## Contents
 
-- \`migrations/001_create_products.sql\`: creates the products table, constraints, expiration index, and update timestamp trigger.
-- \`seeds/002_seed_demo_products.sql\`: inserts four illustrative products only when the table is empty.
+- `migrations/001_create_products.sql`: creates the products table, constraints, expiration index, and update timestamp trigger.
+- `seeds/002_seed_demo_products.sql`: inserts four illustrative products only when the table is empty.
 
 ## Product contract
 
 The database uses the wire values defined in the project domain model:
 
-- Units: \`unit\`, \`g\`, \`kg\`, \`ml\`, \`L\`, \`package\`.
-- Categories: \`produce\`, \`dairy\`, \`pantry_staples\`, \`canned_goods\`, \`bakery\`, \`meat_eggs\`, \`snacks_other\`.
-- \`expiration_date\` is nullable and uses PostgreSQL \`DATE\`, not a UTC timestamp.
+- Units: `unit`, `g`, `kg`, `ml`, `L`, `package`.
+- Categories: `produce`, `dairy`, `pantry_staples`, `canned_goods`, `bakery`, `meat_eggs`, `snacks_other`.
+- `expiration_date` is nullable and uses PostgreSQL `DATE`, not a UTC timestamp.
 - Quantity must be greater than zero with at most three decimal places; Units and Packages require integer quantities. The schema uses NUMERIC(12, 3).
 - IDs and timestamps are managed by PostgreSQL.
 
@@ -25,10 +25,10 @@ The database uses the wire values defined in the project domain model:
 
 From a PostgreSQL shell connected to a dedicated development database:
 
-\`\`\`sql
+```sql
 \\i migrations/001_create_products.sql
 \\i seeds/002_seed_demo_products.sql
-\`\`\`
+```
 
 The migration is also mounted into the local Docker Compose stack maintained by ppal-infra. PostgreSQL's container initialization scripts run only when the data directory is first created. To reinitialize a disposable local demo database, use docker compose down -v from the infrastructure directory; this permanently deletes that local database volume.
 
