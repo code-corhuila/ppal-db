@@ -26,8 +26,8 @@ The database uses the wire values defined in the project domain model:
 From a PostgreSQL shell connected to a dedicated development database:
 
 ```sql
-\\i migrations/001_create_products.sql
-\\i seeds/002_seed_demo_products.sql
+\i migrations/001_create_products.sql
+\i seeds/002_seed_demo_products.sql
 ```
 
 The migration is also mounted into the local Docker Compose stack maintained by ppal-infra. PostgreSQL's container initialization scripts run only when the data directory is first created. To reinitialize a disposable local demo database, use docker compose down -v from the infrastructure directory; this permanently deletes that local database volume.
