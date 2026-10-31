@@ -1,38 +1,37 @@
 # ppal-db
 
-Version-controlled PostgreSQL schema migrations and demonstration seed data for PantryPal.
+Versioned PostgreSQL schema and migration assets for PantryPal.
 
-Part of **PantryPal** (`ppal`) — Mobile Development Engineering (graduate program) · CORHUILA 2026-B.
+## Scope
 
-| | |
-|---|---|
-| Role | PostgreSQL schema, constraints, migrations, and seed data |
-| Containerization | Not independently containerized; migration and seed scripts are applied by `ppal-infra` |
-| Project governance and documentation | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
-| Backlog | GitHub Project `ppal-backlog` |
+The MVP stores products for one controlled demonstration pantry. It has no user accounts, pantry ownership, or per-user isolation. The database is suitable for local development and controlled demonstrations only.
 
-## Branches
+## Contents
 
-| Branch | Purpose |
-|---|---|
-| `develop` | Integration and default branch |
-| `qa` | Quality assurance |
-| `main` | Production/release baseline |
+- `migrations/001_create_products.sql`: creates the products table, constraints, expiration index, and update timestamp trigger.
+- `seeds/002_seed_demo_products.sql`: inserts four illustrative products only when the table is empty.
 
-**All changes to `develop`, `qa`, or `main` must go through a pull request.** Direct commits, force-pushes, and branch deletion are disabled for these branches, including for administrators.
+## Product contract
 
-1. Daily work: create a `feat/<topic>` or `fix/<topic>` branch from `develop`, then open a PR to `develop`.
-2. Promotion: open a PR from `develop` to `qa`, then from `qa` to `main`.
-3. A PR to `main` requires instructor approval. Delete a working branch after its PR is merged.
+The database uses the wire values defined in the project domain model:
 
-## Project repositories
+- Units: `unit`, `g`, `kg`, `ml`, `L`, `package`.
+- Categories: `produce`, `dairy`, `pantry_staples`, `canned_goods`, `bakery`, `meat_eggs`, `snacks_other`.
+- `expiration_date` is nullable and uses PostgreSQL `DATE`, not a UTC timestamp.
+- Quantity must be greater than zero with at most three decimal places; Units and Packages require integer quantities. The schema uses NUMERIC(12, 3).
+- IDs and timestamps are managed by PostgreSQL.
 
-| Repository | Role |
-|---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Project governance and documentation source of truth |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Business logic and REST API |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Mobile application |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Optional web portal |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | PostgreSQL schema and migrations |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infrastructure and orchestration |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Shared development tooling |
+## Local execution
+
+From a PostgreSQL shell connected to a dedicated development database:
+
+```sql
+\i migrations/001_create_products.sql
+\i seeds/002_seed_demo_products.sql
+```
+
+The migration is also mounted into the local Docker Compose stack maintained by ppal-infra. PostgreSQL's container initialization scripts run only when the data directory is first created. To reinitialize a disposable local demo database, use docker compose down -v from the infrastructure directory; this permanently deletes that local database volume.
+
+## Security boundary
+
+The current API has no authentication. Do not expose this database or its unauthenticated API as a public multi-user production service, and do not store sensitive personal data.
