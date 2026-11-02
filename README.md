@@ -9,7 +9,7 @@ The MVP stores products for one controlled demonstration pantry. It has no user 
 ## Contents
 
 - `migrations/001_create_products.sql`: creates the products table, constraints, expiration index, and update timestamp trigger..
-- `seeds/002_seed_demo_products.sql`: inserts four illustrative products only when the table is empty.
+- `seeds/002_seed_demo_products.sql`: inserts four illustrative products only when the table is empty..
 
 ## Product contract
 
